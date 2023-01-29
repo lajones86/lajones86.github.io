@@ -22,6 +22,7 @@ div.panel_data {
 	grid-column-gap: 1em;
 	font-size:	1.5em;
 	padding-left: .5em;
+	padding-right: .5em;
 	padding-top: .25em;
 	padding-bottom: .25em;
 }
@@ -44,3 +45,6 @@ div.button.tile_action {
 
 
 /* data fields */
+input[type="text"] {
+	font-size: 1.1em;
+}
