@@ -27,6 +27,11 @@ div.panel_data {
 	padding-bottom: .25em;
 }
 
+div.minimized {
+	display: none;
+}
+
+
 /* buttons */
 div.button {
 	text-align: center;
@@ -35,13 +40,24 @@ div.button {
 	font-weight: bold;
 }
 
-div.button.view {
+div.button.blue {
+	background-color: aqua;
+}
+
+
+div.button.green {
+	background-color: lime;
+}
+
+div.button.orange {
 	background-color: orange;
 }
 
-div.button.tile_action {
-	background-color: lime;
+div.button.dead {
+	background-color: pink;
+	color: pink;
 }
+
 
 
 /* data fields */

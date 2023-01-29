@@ -6,10 +6,6 @@ const entry_module_name = "druidity";
 import * as mm from "./engine_includes/module_manager.js";
 import * as panels from "./engine_includes/panels.js";
 
-function update_panel() {
-	console.log("update what now?");
-}
-
 
 export function bootstrap() {
 	console.log("HTE bootstrapper started");
@@ -25,16 +21,8 @@ export function bootstrap() {
 	// onward with the bootstrapping!
 	else {
 		console.log("HTE bootstrapper is attempting to load entry module");
-		let tile = panels.build_panel(mm.query(entry_module_name));
-		//update_panel();
-		return(tile);
-	}
-
-
-	// Something's gone wrong if we trigger this block
-	{
-		let message_out = "HTE bootstrapper got nothing from entry module";
-		console.log(message_out);
-		return(message_out);
+		let entry_panel = panels.build_panel((mm.query(entry_module_name)), document.body);
+		//console.log(entry_panel);
+		return(0);
 	}
 }
