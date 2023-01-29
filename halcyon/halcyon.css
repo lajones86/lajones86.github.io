@@ -1,0 +1,27 @@
+/* primary section container*/
+div.fant_section {
+border: 3px solid black;
+}
+
+
+div.section_header {
+	display: grid;
+	grid-template-columns: 3em min-content;
+}
+
+div.section_header > div {
+	font-size: 2em;
+	font-weight: bold;
+}
+
+div.section_title {
+	padding-left: 1em;
+}
+
+
+/* buttons */
+div.button.view {
+	background-color: red;
+	text-align: center;
+	border: 2px solid black;
+}
