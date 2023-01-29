@@ -1,23 +1,35 @@
-div.module_section {
+div.module_box {
 border: 3px solid black;
+width: min-content;
 }
-
 
 div.section_header {
 	display: grid;
-	grid-template-columns: 3em min-content;
+	grid-template-columns: 2em min-content;
 	font-size: 2em;
 	font-weight: bold;
+	border-bottom:	2px solid black;
 }
 
 div.section_title {
 	padding-left: 1em;
 }
 
+div.panel_data {
+	display: grid;
+	grid-template-columns: min-content min-content;
+	grid-column-gap: 1em;
+	font-size:	1.5em;
+	padding-left: .5em;
+	padding-top: .25em;
+}
+
+div.panel_label {
+}
 
 /* buttons */
 div.button.view {
-	background-color: red;
+	background-color: orange;
 	text-align: center;
 	border: 2px solid black;
 }

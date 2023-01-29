@@ -5,8 +5,8 @@ requires a module_name and a friendly_name
 */
 class ManagedModule {
 	constructor(raw_module) {
-		if ((!raw_module.module_name) || (!raw_module.friendly_name)){
-			bad_message("module_manager.js encountered a missing module_name, friendly_name, or both. aborting module manager.");		
+		if ((!raw_module.basepanel.module_name) || (!raw_module.basepanel.friendly_name)){
+			bad_message("module_manager.js failed to find module_name, friendly_name, or both in valid basepanel object. aborting module manager.");		
 		}
 		else { this.module_data = raw_module; }
 	};
@@ -14,15 +14,14 @@ class ManagedModule {
 var managed_modules = [];
 
 // import and push modules here
-import {char_stats} from "./modules/char_stats.js";
-managed_modules.push(new ManagedModule(char_stats));
+import * as druidity from "./modules/druidity.js";
+managed_modules.push(new ManagedModule(druidity));
 
 
 // public bits
 export function query(module_name){
-	console.log(`requested ${module_name} from module_manager.js`);
-	return((managed_modules.find(x => x.module_data.module_name === module_name)).module_data);
-	bad_message("The query function in module_manager.js should not hit this statement");
+	//console.log(`requested ${module_name} from module_manager.js`);
+	return((managed_modules.find(x => x.module_data.basepanel.module_name === module_name)).module_data);
 }
 
 export function bad_message(message_out) {
