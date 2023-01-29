@@ -13,9 +13,17 @@ class ManagedModule {
 }
 var managed_modules = [];
 
+
 // import and push modules here
 import * as druidity from "./modules/druidity.js";
 managed_modules.push(new ManagedModule(druidity));
+
+
+
+
+
+//magic below here
+let live_panels = [];
 
 
 // public bits
