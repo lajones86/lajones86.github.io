@@ -1,8 +1,0 @@
-{
-	"module_name":	"char_stats",
-	"friendly_name": "Druidity",
-	"start_modal": true,
-	
-	"level": 6,
-	"spellcasting_mod":	8
-}
