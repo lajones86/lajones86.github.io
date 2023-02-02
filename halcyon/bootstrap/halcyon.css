@@ -7,7 +7,7 @@ select, input {
 	background-color: gray;
 	color: black;
 }
-select:hover, input:hover { background-color: Gainsboro; }
+select:hover, input:hover { background-color: DarkGray; }
 
 div.module_box {
 border: 3px solid black;
