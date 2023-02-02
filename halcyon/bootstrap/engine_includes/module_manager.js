@@ -1,6 +1,6 @@
 "use strict";
 
-console.log("module_manager.js is awake");
+console.log(`Module awake: ${(new Error).fileName}`)
 
 /* default module constructor
 requires a module_name and a friendly_name

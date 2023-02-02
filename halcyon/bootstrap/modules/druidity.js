@@ -1,6 +1,6 @@
 "use strict";
 
-console.log("Module druidity.js is awake");
+console.log(`Module awake: ${(new Error).fileName}`)
 
 const summons = {
 	get_type_info: (summon_type, stat, spell_level, subtype) => {

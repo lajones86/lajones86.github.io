@@ -1,5 +1,6 @@
 "use strict";
 
+console.log(`Module awake: ${(new Error).fileName}`)
 console.log("Halcyon TTRPG Engine Bootstrapper is online.")
 
 import * as mm from "./engine_includes/module_manager.js";

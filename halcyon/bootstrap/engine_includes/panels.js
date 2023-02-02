@@ -1,6 +1,6 @@
 "use strict";
 
-console.log("panels.js is awake");
+console.log(`Module awake: ${(new Error).fileName}`)
 
 const framework_baseline_properties = ["panel_name"];
 
