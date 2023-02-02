@@ -1,6 +1,5 @@
 body {
-	background-color: dimgray;
-	color: whitesmoke;
+	background-color:  	#383838;
 }
 
 select, input {
@@ -11,6 +10,8 @@ select:hover, input:hover { background-color: DarkGray; }
 
 div.module_box {
 border: 3px solid black;
+background-color: dimgray;
+color: whitesmoke;
 width: min-content;
 }
 

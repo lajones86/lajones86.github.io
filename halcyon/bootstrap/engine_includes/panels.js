@@ -6,11 +6,17 @@ function generate_id(panel_name, field_name) {
 	return(`${panel_name}-${field_name}`);
 }
 
+function make_title_from_varname(varname) {
+	if (varname.length == 2) { return(varname.toUpperCase()); }
+	else {return(varname.replace(/\w\S*/g, function(txt) {return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); } )); }
+}
+	
+
 class Panel {
 	constructor(panel_data, target) {
 		//set class members
 		this.panel_name = panel_data.panel_name;
-		this.title = this.panel_name
+		this.title = make_title_from_varname(this.panel_name);
 		this.id = generate_id(this.panel_name, this.panel_name);
 		this.action_id = generate_id(this.panel, "panelbutton");
 		this.view_id = generate_id(this.panel_name, "viewbutton");
@@ -36,11 +42,15 @@ class Panel {
 		
 		//set dom data
 		
+		console.log("repetition here needs abstracted");
 		let html_string = `<div id=${this.id} class=module_box><div class=section_header><div id=${this.view_id} class="button blue">--</div><div class=section_title>${this.title}</div></div><div id=${this.panelwindow_id}><div id=${this.paneldata_id} class=panel_data>`;
 		for (let [key, value] of Object.entries(panel_data)) {
 			if(!framework_baseline_properties.includes(key)) {
 				this.input_id = `${this.panel_name}-${key}`;
-				html_string += (`<div>${key}</div>`);
+				
+				///get label from key
+				let title = make_title_from_varname(key);
+				html_string += (`<div>${title}</div>`);
 				
 				let value_type = typeof(value)
 				

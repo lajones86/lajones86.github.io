@@ -34,7 +34,7 @@ export var panel1 = {
 	},
 	
 	attacks: (this_panel) => { return(Math.floor(this_panel.beast_spell_level/2)); },
-	maul_hit: (druidity_panel) => {	return(druidity_panel.casting_mod); },
+	//maul_hit: (me) => {	return(me.panel0.casting_mod); },
 	
 }
 
