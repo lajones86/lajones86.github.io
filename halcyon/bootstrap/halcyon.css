@@ -1,3 +1,13 @@
+body {
+	background-color: dimgray;
+	color: whitesmoke;
+}
+
+input {
+	background-color: darkgray;
+	color: black;
+}
+
 div.module_box {
 border: 3px solid black;
 width: min-content;
@@ -27,8 +37,12 @@ div.panel_data {
 	padding-bottom: .25em;
 }
 
-div.minimized {
+.minimized {
 	display: none;
+}
+
+.maximized {
+	display: inline-block;
 }
 
 
@@ -41,7 +55,7 @@ div.button {
 }
 
 div.button.blue {
-	background-color: aqua;
+	background-color: blue;
 }
 
 
