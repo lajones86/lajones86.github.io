@@ -41,8 +41,6 @@ class Panel {
 		};
 		
 		//set dom data
-		
-		console.log("repetition here needs abstracted");
 		let html_string = `<div id=${this.id} class=module_box><div class=section_header><div id=${this.view_id} class="button blue">--</div><div class=section_title>${this.title}</div></div><div id=${this.panelwindow_id}><div id=${this.paneldata_id} class=panel_data>`;
 		for (let [key, value] of Object.entries(panel_data)) {
 			if(!framework_baseline_properties.includes(key)) {
