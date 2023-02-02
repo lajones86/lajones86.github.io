@@ -1,5 +1,7 @@
 "use strict";
 
+console.log("panels.js is awake");
+
 const framework_baseline_properties = ["panel_name"];
 
 function generate_id(panel_name, field_name) {
@@ -8,7 +10,7 @@ function generate_id(panel_name, field_name) {
 
 function make_title_from_varname(varname) {
 	if (varname.length == 2) { return(varname.toUpperCase()); }
-	else {return(varname.replace(/\w\S*/g, function(txt) {return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); } )); }
+	else {varname = varname.replaceAll("_", " ");return(varname.replaceAll(/\w\S*/g, function(txt) {return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); } )); }
 }
 	
 
@@ -55,17 +57,19 @@ class Panel {
 				if (value_type == "function") {
 					let function_name = value.name.toString();
 					value = panel_data[function_name](panel_data);
+					value_type = typeof(value)
 				};
 				
 				
-				if (["number", "string", "function"].includes(value_type)) {
+				if (["number", "string"].includes(value_type)) {
 					html_string += `<input id="${this.input_id}" type="text" value=${value}>`;
 				}
 
 				else if (value_type == "object") {
 					html_string += `<select id="${this.input_id}">`;
 					for (let entry in value) {
-						html_string += `<option value="${value[entry]}">${value[entry]}</options>`
+						let option_title = (make_title_from_varname((value[entry]).toString()));
+						html_string += `<option value="${value[entry]}">${option_title}</options>`
 					}
 					html_string += "</select>";
 					panel_data[key] = value[0];
@@ -103,7 +107,9 @@ function build_module(module, target) {
 }
 
 export function build_modules(modules, target) {
+	console.log("panels.js received build_modules request");
 	for (let m = 0; m < modules.length; m++){
+		console.log(`attempting to build module ${m+1} of ${modules.length}`)
 		build_module(modules[m], target);
 	}
 }

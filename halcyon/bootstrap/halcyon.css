@@ -26,11 +26,13 @@ div.section_title {
 	padding-right: 1em;
 	font-size: 2em;
 	font-weight: bold;
+	white-space: nowrap;
 }
 
 div.panel_data {
 	display: grid;
 	grid-template-columns: min-content min-content;
+	white-space: nowrap;
 	grid-column-gap: 1em;
 	font-size:	1.5em;
 	padding-left: .5em;

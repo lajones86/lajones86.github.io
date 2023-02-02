@@ -1,5 +1,7 @@
 "use strict";
 
+console.log("module_manager.js is awake");
+
 /* default module constructor
 requires a module_name and a friendly_name
 */
@@ -14,7 +16,6 @@ class ManagedModule {
 	};
 }
 export var managed_modules = [];
-
 
 // import and push modules here
 import * as druidity from "../modules/druidity.js";
