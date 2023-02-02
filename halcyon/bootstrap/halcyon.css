@@ -7,6 +7,7 @@ select, input {
 	color: black;
 }
 select:hover, input:hover { background-color: DarkGray; }
+input { width: 3em; }
 
 div.module_box {
 border: 3px solid black;

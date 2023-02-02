@@ -18,9 +18,15 @@ class ManagedModule {
 export var managed_modules = [];
 
 // import and push modules here
+
+//FANTASY DRUID KIT
 import * as druidity from "../modules/druidity.js";
 managed_modules.push(new ManagedModule(druidity));
 
+
+
+
+//public functions
 export function bad_message(message_out) {
 	console.log(message_out);
 	alert(message_out);
