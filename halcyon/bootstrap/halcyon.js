@@ -19,6 +19,7 @@ export function bootstrap() {
 	else {
 		console.log("HTE bootstrapper is attempting to load modules");
 		panels.build_modules(mm.managed_modules, document.body);
+		console.log(document.body.innerHTML);
 		
 		return(0);
 	}

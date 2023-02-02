@@ -5,10 +5,12 @@ requires a module_name and a friendly_name
 */
 class ManagedModule {
 	constructor(raw_module) {
-		if (!raw_module.panel0.panel_name){
-			bad_message("module_manager.js failed to find . aborting module manager.");		
+		for (let panel in raw_module) {
+			if (!raw_module[panel].panel_name)
+			{  console.log(raw_module);bad_message("module_manager.js failed to find panel_name in module. aborting module manager."); }
 		}
-		else { this.module_data = raw_module; }
+		
+		this.module_data = raw_module;
 	};
 }
 export var managed_modules = [];

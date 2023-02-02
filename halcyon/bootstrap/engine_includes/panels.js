@@ -34,15 +34,36 @@ class Panel {
 			else {this.className = "button broken"};
 		};
 		
-		
-
 		//set dom data
 		
 		let html_string = `<div id=${this.id} class=module_box><div class=section_header><div id=${this.view_id} class="button blue">--</div><div class=section_title>${this.title}</div></div><div id=${this.panelwindow_id}><div id=${this.paneldata_id} class=panel_data>`;
 		for (let [key, value] of Object.entries(panel_data)) {
-			if(!framework_baseline_properties.includes(`${key}`)){
-				this.input_id = `${this.module_name}-${key}`;
-				html_string += (`<div>${key}</div><input id="${this.input_id}" type="text" value=${value}>`);
+			if(!framework_baseline_properties.includes(key)) {
+				this.input_id = `${this.panel_name}-${key}`;
+				html_string += (`<div>${key}</div>`);
+				
+				let value_type = typeof(value)
+				
+				if (value_type == "function") {
+					let function_name = value.name.toString();
+					value = panel_data[function_name](panel_data);
+				};
+				
+				
+				if (["number", "string", "function"].includes(value_type)) {
+					html_string += `<input id="${this.input_id}" type="text" value=${value}>`;
+				}
+
+				else if (value_type == "object") {
+					html_string += `<select id="${this.input_id}">`;
+					for (let entry in value) {
+						html_string += `<option value="${value[entry]}">${value[entry]}</options>`
+					}
+					html_string += "</select>";
+					panel_data[key] = value[0];
+				}
+				
+				else { html_string += `<span>${value_type}`; }
 			}
 		}
 		html_string += "</div>";
@@ -57,7 +78,6 @@ class Panel {
 	}
 	
 	set_event_listeners() {
-		console.log(this.view_id);
 		document.getElementById(this.view_id).addEventListener("click", this.view_click);
 	}
 }
@@ -65,7 +85,6 @@ class Panel {
 function build_panel(panel_data, target) {
 	var panel_out = new Panel(panel_data, target);
 	panel_out.set_event_listeners();
-	console.log(panel_out);
 	return(panel_out);
 }
 
