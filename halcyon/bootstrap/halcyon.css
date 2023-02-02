@@ -3,10 +3,11 @@ body {
 	color: whitesmoke;
 }
 
-input {
-	background-color: darkgray;
+select, input {
+	background-color: gray;
 	color: black;
 }
+select:hover, input:hover { background-color: Gainsboro; }
 
 div.module_box {
 border: 3px solid black;
@@ -54,9 +55,8 @@ div.button {
 	font-weight: bold;
 }
 
-div.button.blue {
-	background-color: blue;
-}
+div.button.blue { background-color: navy; }
+div.button.blue:hover { background-color: blue; }
 
 
 div.button.green {
