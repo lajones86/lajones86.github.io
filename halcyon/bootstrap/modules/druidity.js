@@ -2,97 +2,72 @@
 
 console.log(`Module awake: ${(new Error).fileName}`)
 
-const summons = {
-	get_type_info: (summon_type, stat, spell_level, subtype) => {
-		
-		//BEAST SPIRIT
-		if (summon_type == "beast")	{
-			if (stat == "level") { return([2, 3, 4, 5, 6, 7, 8, 9]) }
-			else if (stat == "subtype") { return(["land", "air", "water"]) }
-			else if (stat == "ac") { return(spell_level + 11) }
+class Summon {
+	constructor(s) {
+		this.summon_type = s.summon_type;
+		this.min_level = s.min_level;
+		this.subtypes = s.subtypes;
+	};
+}
 
-			//SPIRIT HP
-			else if (stat == "hp") {
-				let base_hp = 0
-				let bonus_hp = 0
-				if (subtype == "land") { base_hp = 10 }
-				else {console.log(subtype)}
-				return(base_hp+bonus_hp);
-			}
-			else {return(`unknown:${stat}`)};
+
+let summon_types = {
+	beast: {
+		summon_type: "beast",
+		min_level: 2,
+		subtypes: {
+			"land": {
+				"hp": 30,
+			},
+			"air": {
+				"hp": 20,
+			},
+			"water": {
+				"hp": 30,
+			},
 		}
-		
-		//FEY SPIRIT
-		else if (summon_type == "fey") {
-			if (stat == "level") { return([3, 4, 5, 6, 7, 8, 9]) }
-			else {return(`unknown:${stat}`)}
-		}
-		
-		//ELEMENTAL SPIRIT
-		else if (summon_type == "elemental") {
-			if (stat == "level") { return([4, 5, 6, 7, 8, 9]) }
-			else {return(`unknown:${stat}`)}
-		}
-		else {return(`unknown:${summon_type}`)}
 	},
-}
+	fey: {
+		summon_type: "fey",
+		min_level: 3,
+		subtypes: ["fuming", "mirthful", "tricksy"],
+	},
+	elemental: {
+		summon_type: "elemental",
+		min_level: 4,
+		subtypes: ["air", "earth", "fire", "water"],
+	},
+};
 
-
-//stuff for the panel manager
+//druidity panel
 export var panel0 = {
-  panel_name: "druidity",
-  level: 6,
-  casting_mod: 8,
-  casting_save: 15,
-  proficiency: 3,
-}
+	panel_name: "druidity",
+	level: 6,
+	casting_mod: 8,
+	casting_save: 15,
+};
 
-export var panel05 = {
-	panel_name: "totems",
-	totem_type: ["unicorn", "bear", "hawk"],
-}
+//summons panel helpers
+const summons = [
+	new Summon(summon_types["beast"]),
+	new Summon(summon_types["fey"]),
+	new Summon(summon_types["elemental"]),
+	]
+	
+function get_summon() {
+	let summon_type = document.getElementById("summons-summon_type");
+	if (summon_type) { var summon_type_name = summon_type.value; }
+	else { var summon_type_name = Object.keys(summon_types)[0]; }
+	var summon = summons.filter(summon_instance => {
+		return summon_instance.summon_type === summon_type_name });
+	if (summon.length == 1) { summon = summon[0] };
+	return(summon);
+}	
 
+//summons panel
 export var panel20 = {
 	panel_name: "summons",
-	summon_type: ["beast", "fey", "elemental"],
-	spell_level: (this_panel) => summons.get_type_info(this_panel.summon_type, "level"),
-	subtype: (this_panel) => summons.get_type_info(this_panel.summon_type, "subtype"),
-	ac: (this_panel) => summons.get_type_info(this_panel.summon_type, "ac", this_panel.spell_level),
-	hp: (this_panel) => summons.get_type_info(this_panel.summon_type, "hp", this_panel.spell_level, this_panel.subtype),
-	//bundle with hp
-	//and extra
-}
-
-export var panel30 = {
-	panel_name: "wild_shape",
-	placeholder: 0,
-}
-	//summon_ac: (this_panel) => summons.ac(this_panel.summon_type),
-
-//	summon_level: ,
+	summon_type: Object.keys(summon_types),
+	subtype: Object.keys(get_summon().subtypes),
 	
-
-	/*
-	ac: (this_panel) => {return(this_panel.beast_spell_level + 11);},
-	
-	hp: (this_panel) => {
-		let sl = this_panel.beast_spell_level;
-		let bt = this_panel.beast_type;
-		let bonus_hp = (sl - 2) * 5;
-		let default_hp = 0;
-		if (bt == "air") { default_hp = 20; }
-		else { default_hp = 30; }
-		return(default_hp + bonus_hp);
-	},
-	
-	speed: (this_panel) => {
-		let bt = this_panel.beast_type;
-		if (bt == "land") { return("30ft/30ft_climb"); }
-		else if (bt == "air") { return("fly_60ft"); }
-		else if (bt == "water") { return("swim_30ft"); }
-		return(0);
-	},
-	
-	attacks: (this_panel) => { return(Math.floor(this_panel.beast_spell_level/2)); },
-	maul_hit: (panels) => { return(me.panel0.casting_mod); },
-	*/
+};

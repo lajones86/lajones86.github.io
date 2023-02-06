@@ -9,6 +9,7 @@ function generate_id(panel_name, field_name) {
 }
 
 function make_title_from_varname(varname) {
+	//console.log(varname);
 	if (varname.length == 2) { return(varname.toUpperCase()); }
 	else {varname = varname.replaceAll("_", " ");return(varname.replaceAll(/\w\S*/g, function(txt) {return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); } )); }
 }
@@ -17,6 +18,7 @@ function make_title_from_varname(varname) {
 class Panel {
 	constructor(panel_data, target) {
 		//set class members
+		//console.log(panel_data);
 		this.panel_name = panel_data.panel_name;
 		this.title = make_title_from_varname(this.panel_name);
 		this.id = generate_id(this.panel_name, this.panel_name);
@@ -24,8 +26,6 @@ class Panel {
 		this.view_id = generate_id(this.panel_name, "viewbutton");
 		this.panelwindow_id = generate_id(this.panel_name, "panelwindow");
 		this.paneldata_id = generate_id(this.panel_name, "paneldata");
-		
-		if (panel_data.action_button){ this.actionbutton = true;}
 		
 		//making the front end and back end play nice with this, i hope
 		var class_root = this;
@@ -42,29 +42,33 @@ class Panel {
 			else {this.className = "button broken"};
 		};
 		
-		//set dom data
+		//initial body load
 		let html_string = `<div id=${this.id} class=module_box><div class=section_header><div id=${this.view_id} class="button blue">--</div><div class=section_title>${this.title}</div></div><div id=${this.panelwindow_id}><div id=${this.paneldata_id} class=panel_data>`;
 		for (let [key, value] of Object.entries(panel_data)) {
-			if(!framework_baseline_properties.includes(key)) {
+			if (!framework_baseline_properties.includes(key)) {
 				this.input_id = `${this.panel_name}-${key}`;
 				
-				///get label from key
-				let title = make_title_from_varname(key);
-				html_string += (`<div>${title}</div>`);
-				
+							
 				let value_type = typeof(value)
 				
 				if (value_type == "function") {
 					let function_name = value.name.toString();
 					value = panel_data[function_name](panel_data);
 					value_type = typeof(value)
+					if (value_type == "string" && value.length > 24) {value_type = "panel_quote"};
 				};
 				
+				//add left side for 2-column entry
+				if (value_type != "panel_quote") {
+					let title = make_title_from_varname(key);
+					html_string += (`<div>${title}</div>`);
+				}
 				
 				if (["number", "string"].includes(value_type)) {
 					html_string += `<input id="${this.input_id}" type="text" value=${value}>`;
 				}
 
+				//add right side for 2-column entry
 				else if (value_type == "object") {
 					html_string += `<select id="${this.input_id}">`;
 					for (let entry in value) {
@@ -75,14 +79,17 @@ class Panel {
 					panel_data[key] = value[0];
 				}
 				
-				else { html_string += `<span>${value_type}`; }
+				else if (value_type == "panel_quote") {
+					//html_string += "<div>foo</div><div>bar</div>";
+					html_string += `<div class="grid_infopane">${value}</div>`;
+				}
+				
+				//dunno what to do with this. here's what it is
+				else { html_string += `<span>${value_type}</span>`; }
 			}
 		}
 		html_string += "</div>";
 
-		if (this.action_button) {
-			html_string += `<div id="${this.action_id}" class="button green">Lock</div>`;	
-		}
 		html_string += "</div></div>";
 	
 		target.insertAdjacentHTML('beforeend', html_string);
@@ -94,15 +101,17 @@ class Panel {
 	}
 }
 
-function build_panel(panel_data, target) {
-	var panel_out = new Panel(panel_data, target);
+function build_panel(panel_data, target, panel_collection) {
+	var panel_out = new Panel(panel_data, target, panel_collection);
 	panel_out.set_event_listeners();
 	return(panel_out);
 }
 
 function build_module(module, target) {
-	for (let [key, value] of Object.entries(module.module_data)) {
-		build_panel(value, target);
+	let panel_collection = {};
+	for (let [key, panel_data] of Object.entries(module.module_data)) {
+		let new_panel = build_panel(panel_data, target, panel_collection);
+		panel_collection[new_panel.name] = new_panel;
 	}
 }
 

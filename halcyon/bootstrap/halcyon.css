@@ -7,7 +7,9 @@ select, input {
 	color: black;
 }
 select:hover, input:hover { background-color: DarkGray; }
-input { width: 3em; }
+select, input[type="text"] { font-size: 1.2em; }
+
+
 
 div.module_box {
 border: 3px solid black;
@@ -18,8 +20,16 @@ width: min-content;
 
 div.section_header {
 	display: grid;
-	grid-template-columns: 3em min-content;
+	grid-template-columns: 3em 24em;
 	border-bottom:	2px solid black;
+}
+
+div.grid_infopane {
+  grid-column: 1 / 3;
+  text-align: left;
+  margin: 1em;
+  font-style: italic;
+  font-size: 1.1em;
 }
 
 div.section_title {
@@ -35,7 +45,6 @@ div.panel_data {
 	grid-template-columns: min-content min-content;
 	white-space: nowrap;
 	grid-column-gap: 1em;
-	font-size:	1.5em;
 	padding-left: .5em;
 	padding-right: .5em;
 	padding-top: .25em;
@@ -74,11 +83,4 @@ div.button.orange {
 div.button.dead {
 	background-color: pink;
 	color: pink;
-}
-
-
-
-/* data fields */
-input[type="text"] {
-	font-size: 1.1em;
 }

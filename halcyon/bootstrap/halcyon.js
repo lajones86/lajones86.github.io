@@ -21,7 +21,8 @@ export function bootstrapper() {
 	else {
 		console.log("HTE bootstrapper is attempting to load module_manager.js and panels.js");
 		panels.build_modules(mm.managed_modules, document.body);
-		console.log(document.body.innerHTML);
+		//console.log(document.body.innerHTML);
+		console.log(new XMLSerializer().serializeToString(document));
 		return(0);
 	}
 }
