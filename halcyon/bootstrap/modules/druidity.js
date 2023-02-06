@@ -14,7 +14,7 @@ class Summon {
 	};
 }
 
-
+//models
 let summon_types = {
 	beast: {
 		summon_type: "beast",
@@ -52,6 +52,16 @@ let summon_types = {
 	},
 };
 
+//druidity panel
+export var panel0 = {
+	_panel_name: "druidity",
+	level: 6,
+	casting_mod: 8,
+	casting_save: 15,
+};
+
+
+
 //summons panel helpers
 const summons = [
 	new Summon(summon_types["beast"]),
@@ -60,6 +70,8 @@ const summons = [
 	]
 
 function get_summon() {
+	//var x = (x === undefined) ? your_default_value : x;
+	console.log("fetching summon object");
 	let summon_type = document.getElementById("summons-summon_type");
 	if (summon_type) { var summon_type_name = summon_type.value; }
 	else { var summon_type_name = Object.keys(summon_types)[0]; }
@@ -69,15 +81,6 @@ function get_summon() {
 	return(summon);
 }
 
-
-//druidity panel
-export var panel0 = {
-	_panel_name: "druidity",
-	level: 6,
-	casting_mod: 8,
-	casting_save: 15,
-};
-
 //summons panel
 export var panel20 = {
 	_panel_name: "summons",
@@ -85,17 +88,11 @@ export var panel20 = {
 	subtype: get_summon().update_subtypes(),
 };
 
-/*onload functions
-function summon_type_changed() {
-	console.log("Summon type changed");
-	let target = document.getElementById("summons-subtype");
-	console.log(target.value = false);
-	console.log("get the panel_janitor function going");
-}
 
-function documentLoaded() {
-	document.getElementById("summons-summon_type").addEventListener("change", summon_type_changed);
-}
 
-window.addEventListener("load", documentLoaded);
-*/
+
+//summons panel
+export var panel40 = {
+	_panel_name: "totems",
+	totem_type: [1, 2, 3],
+};

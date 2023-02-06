@@ -20,7 +20,7 @@ class Panel {
 		//console.log(panel_data);
 		this._panel_name = panel_data._panel_name;
 		this._event_listeners = panel_data._event_listeners;
-		this.panel_name = panel_data._panel_name;
+		this.panel_name = this._panel_name;
 		this.title = make_title_from_varname(this.panel_name);
 		this.id = generate_id(this.panel_name, this.panel_name);
 		this.action_id = generate_id(this.panel, "panelbutton");
@@ -58,6 +58,20 @@ class Panel {
 			html_string += "</select>";
 			//console.log(html_string);
 			return(html_string);
+		}
+		
+		
+		/*
+		update the panel when a change has been registered
+		*/
+		this.update_panel = function(starting_field = undefined) {
+			for (let sb in class_root.select_boxes) {
+				let this_box = class_root.select_boxes[sb];
+				if (starting_field){ if (this_box == starting_field) { starting_field = undefined; } }
+				else {
+					console.log(this_box);
+				}
+			}
 		}
 		
 		//initial body load
@@ -112,25 +126,66 @@ class Panel {
 		for (let sb in this.select_boxes) {
 			let the_box = this.select_boxes[sb]
 			//console.log(the_box);
-			document.getElementById(the_box).addEventListener("change", function(){global_panel_janitor(the_box)});
+			document.getElementById(the_box).addEventListener("change", function(){global_janitor(the_box)});
 		}		
 	}
 }
 
-function global_panel_janitor(changed_panel) {
-	console.log(`global janitor has awoken to deal with a change in ${changed_panel}`);
-}
+var global_collection = {};
 
-function build_panel(panel_data, target, panel_collection) {
-	var panel_out = new Panel(panel_data, target, panel_collection);
+function global_janitor(changed_item) {
+	let panel_base = changed_item.substring(0, changed_item.indexOf("-"));
+	//let panel_field = changed_item.substring(changed_item.indexOf("-") + 1,);
+	let starting_panel_object = Object.values(global_collection).filter(panel => panel._panel_name === panel_base)[0];
+	
+	starting_panel_object.update_panel(changed_item);
+	
+	let encountered_start = false;
+	for (let pan in global_collection) {
+		if (encountered_start){
+			global_collection[pan].update_panel();
+		}
+		else {
+			if (pan == panel_base) { encountered_start = true; }
+		};
+	}
+}
+	
+	/*
+	let starting_panel = `${panel_base}-${panel_base}`
+	//console.log(`global janitor has awoken to deal with a change in ${starting_panel}`);
+	
+	//update the changed box, after the changed field
+	//as well as all subsequent boxes
+	let module_boxes = document.body.getElementsByClassName("module_box");
+	let do_this_box = false;
+	for (let mb in module_boxes) {
+		let mb_id = module_boxes[mb].id;
+		if (mb_id) {
+			if (!do_this_box) {
+				if (mb_id == starting_panel) {
+					do_this_box = true;
+					console.log("get the object and update panel from field");
+					//console.log(module_boxes[mb]);
+				}
+			}
+			else {console.log(`update panel ${mb_id}`)};
+		};
+	}
+	//console.log(global_collection);
+	//console.log(Object.values(global_collection));
+	
+	*/
+
+function build_panel(panel_data, target) {
+	var panel_out = new Panel(panel_data, target);
 	return(panel_out);
 }
 
 function build_module(module, target) {
-	let panel_collection = {};
 	for (let [key, panel_data] of Object.entries(module.module_data)) {
-		let new_panel = build_panel(panel_data, target, panel_collection);
-		panel_collection[new_panel.name] = new_panel;
+		let new_panel = build_panel(panel_data, target);
+		global_collection[new_panel._panel_name] = new_panel;
 	}
 }
 
