@@ -2,7 +2,7 @@
 
 console.log(`Module awake: ${(new Error).fileName}`)
 
-const framework_baseline_properties = ["panel_name"];
+const framework_baseline_properties = ["_panel_name", "_event_listeners"];
 
 function generate_id(panel_name, field_name) {
 	return(`${panel_name}-${field_name}`);
@@ -13,23 +13,26 @@ function make_title_from_varname(varname) {
 	if (varname.length == 2) { return(varname.toUpperCase()); }
 	else {varname = varname.replaceAll("_", " ");return(varname.replaceAll(/\w\S*/g, function(txt) {return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); } )); }
 }
-	
 
 class Panel {
 	constructor(panel_data, target) {
 		//set class members
 		//console.log(panel_data);
-		this.panel_name = panel_data.panel_name;
+		this._panel_name = panel_data._panel_name;
+		this._event_listeners = panel_data._event_listeners;
+		this.panel_name = panel_data._panel_name;
 		this.title = make_title_from_varname(this.panel_name);
 		this.id = generate_id(this.panel_name, this.panel_name);
 		this.action_id = generate_id(this.panel, "panelbutton");
 		this.view_id = generate_id(this.panel_name, "viewbutton");
 		this.panelwindow_id = generate_id(this.panel_name, "panelwindow");
 		this.paneldata_id = generate_id(this.panel_name, "paneldata");
+		this.select_boxes = [];
 		
 		//making the front end and back end play nice with this, i hope
 		var class_root = this;
 		
+		// minimize maximize button function
 		this.view_click = function() {
 			if (this.innerText == "--") {
 				(document.getElementById(class_root.panelwindow_id)).className = "minimized";
@@ -42,13 +45,27 @@ class Panel {
 			else {this.className = "button broken"};
 		};
 		
+	
+		//processing objects received from panels exported by modules
+		//currently does a simple list to select box
+		this.process_object = function(object_to_process, input_id) {
+			//console.log(object_to_process);
+			let html_string = `<select id="${input_id}">`;
+			for (let entry in object_to_process) {
+				let option_title = (make_title_from_varname((object_to_process[entry]).toString()));
+				html_string += `<option value="${object_to_process[entry]}">${option_title}</options>`
+			}
+			html_string += "</select>";
+			//console.log(html_string);
+			return(html_string);
+		}
+		
 		//initial body load
 		let html_string = `<div id=${this.id} class=module_box><div class=section_header><div id=${this.view_id} class="button blue">--</div><div class=section_title>${this.title}</div></div><div id=${this.panelwindow_id}><div id=${this.paneldata_id} class=panel_data>`;
 		for (let [key, value] of Object.entries(panel_data)) {
 			if (!framework_baseline_properties.includes(key)) {
-				this.input_id = `${this.panel_name}-${key}`;
-				
-							
+				let input_id = `${this.panel_name}-${key}`;
+											
 				let value_type = typeof(value)
 				
 				if (value_type == "function") {
@@ -65,18 +82,15 @@ class Panel {
 				}
 				
 				if (["number", "string"].includes(value_type)) {
-					html_string += `<input id="${this.input_id}" type="text" value=${value}>`;
+					html_string += `<input id="${input_id}" type="text" value=${value}>`;
 				}
 
 				//add right side for 2-column entry
 				else if (value_type == "object") {
-					html_string += `<select id="${this.input_id}">`;
-					for (let entry in value) {
-						let option_title = (make_title_from_varname((value[entry]).toString()));
-						html_string += `<option value="${value[entry]}">${option_title}</options>`
-					}
-					html_string += "</select>";
+					html_string += this.process_object(value, input_id);
 					panel_data[key] = value[0];
+					this.select_boxes.push(input_id);
+					//console.log(this.select_boxes);
 				}
 				
 				else if (value_type == "panel_quote") {
@@ -94,16 +108,21 @@ class Panel {
 	
 		target.insertAdjacentHTML('beforeend', html_string);
 		
-	}
-	
-	set_event_listeners() {
 		document.getElementById(this.view_id).addEventListener("click", this.view_click);
+		for (let sb in this.select_boxes) {
+			let the_box = this.select_boxes[sb]
+			//console.log(the_box);
+			document.getElementById(the_box).addEventListener("change", function(){global_panel_janitor(the_box)});
+		}		
 	}
+}
+
+function global_panel_janitor(changed_panel) {
+	console.log(`global janitor has awoken to deal with a change in ${changed_panel}`);
 }
 
 function build_panel(panel_data, target, panel_collection) {
 	var panel_out = new Panel(panel_data, target, panel_collection);
-	panel_out.set_event_listeners();
 	return(panel_out);
 }
 

@@ -12,7 +12,7 @@ class ManagedModule {
 			//let this_panel = new raw_module[panel]();
 			let this_panel = raw_module[panel];
 			//console.log(this_panel);
-			if (!this_panel["panel_name"])
+			if (!this_panel["_panel_name"])
 			{  console.log(raw_module);console.log(panel);bad_message("module_manager.js failed to find panel_name in module. aborting module manager."); }
 		}
 		

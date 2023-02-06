@@ -8,6 +8,10 @@ class Summon {
 		this.min_level = s.min_level;
 		this.subtypes = s.subtypes;
 	};
+	
+	update_subtypes() {
+		return(Object.keys(this.subtypes));
+	};
 }
 
 
@@ -24,27 +28,28 @@ let summon_types = {
 			},
 			"water": {
 				"hp": 30,
-			},
+			}
 		}
 	},
 	fey: {
 		summon_type: "fey",
 		min_level: 3,
-		subtypes: ["fuming", "mirthful", "tricksy"],
+		subtypes: {
+		"fuming": {},
+		"mirthful": {},
+		"tricksy": {}
+		}
 	},
 	elemental: {
 		summon_type: "elemental",
 		min_level: 4,
-		subtypes: ["air", "earth", "fire", "water"],
+		subtypes: {
+			"air": {},
+			"earth": {},
+			"fire": {},
+			"water": {}
+		},
 	},
-};
-
-//druidity panel
-export var panel0 = {
-	panel_name: "druidity",
-	level: 6,
-	casting_mod: 8,
-	casting_save: 15,
 };
 
 //summons panel helpers
@@ -53,7 +58,7 @@ const summons = [
 	new Summon(summon_types["fey"]),
 	new Summon(summon_types["elemental"]),
 	]
-	
+
 function get_summon() {
 	let summon_type = document.getElementById("summons-summon_type");
 	if (summon_type) { var summon_type_name = summon_type.value; }
@@ -62,12 +67,35 @@ function get_summon() {
 		return summon_instance.summon_type === summon_type_name });
 	if (summon.length == 1) { summon = summon[0] };
 	return(summon);
-}	
+}
+
+
+//druidity panel
+export var panel0 = {
+	_panel_name: "druidity",
+	level: 6,
+	casting_mod: 8,
+	casting_save: 15,
+};
 
 //summons panel
 export var panel20 = {
-	panel_name: "summons",
+	_panel_name: "summons",
 	summon_type: Object.keys(summon_types),
-	subtype: Object.keys(get_summon().subtypes),
-	
+	subtype: get_summon().update_subtypes(),
 };
+
+/*onload functions
+function summon_type_changed() {
+	console.log("Summon type changed");
+	let target = document.getElementById("summons-subtype");
+	console.log(target.value = false);
+	console.log("get the panel_janitor function going");
+}
+
+function documentLoaded() {
+	document.getElementById("summons-summon_type").addEventListener("change", summon_type_changed);
+}
+
+window.addEventListener("load", documentLoaded);
+*/
