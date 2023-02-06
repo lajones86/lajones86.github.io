@@ -91,7 +91,7 @@ export var panel20 = {
 
 
 
-//summons panel
+//totems panel
 export var panel40 = {
 	_panel_name: "totems",
 	totem_type: [1, 2, 3],
