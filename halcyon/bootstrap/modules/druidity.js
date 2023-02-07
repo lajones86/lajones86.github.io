@@ -82,6 +82,7 @@ class SummonsPanel {
 		
 
 		this._update = function() {
+			console.log("druidity.js _update called");
 			let panel_display = {};
 			//summon_type
 			panel_display["summon_type"] = Object.keys(summon_models);
@@ -96,6 +97,8 @@ class SummonsPanel {
 			//replace _panel_display object
 			
 			class_root._panel_display = panel_display;
+			//console.log(panel_display);
+			//return(class_root);
 		};
 		
 		

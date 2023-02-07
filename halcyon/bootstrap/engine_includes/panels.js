@@ -32,7 +32,7 @@ class Panel {
 		};
 		
 		//build grid row based on data type
-		this.build_row = function(label, field) {
+		this.build_row = function(label, field, default_value) {
 			//console.log(label, field);
 			let ft = typeof(field);
 			let html = `<div>${make_title_from_varname(label)}</div>`;
@@ -50,7 +50,9 @@ class Panel {
 					html += `<select id="${sb_id}">`;
 					for (let i in field) {
 						let option_title = (make_title_from_varname((field[i]).toString()));
-						html += `<option value="${field[i]}">${option_title}</options>`
+						html += `<option value="${field[i]}"`;
+						if ((default_value) && (field[i] == default_value)) { { html += " selected"; }};
+						html += `>${option_title}</options>`;
 					}
 					html += "</select>";
 					this.track_field(sb_id, "sb");
@@ -65,21 +67,26 @@ class Panel {
 			return(html);
 		};
 		
-		/*
-		this.add_event_listeners = function() {
-			var update_target = document.getElementById(this._id);
-			for (let i in this.select_boxes) {
-				let the_box = this.select_boxes[i];
-				document.getElementById(the_box).addEventListener("change", function(){class_root.update(update_target)});
-			};
-		};
-		*/
-		
-		this.update = function(target) {
-			let html = `<div id=${this._id} class=module_box><div class=section_header><div id=${this.view_id} class="button blue">--</div><div class=section_title>${this.title}</div></div><div id=${this.paneldata_id} class=panel_data>`;
+		this.update = function(inbound_target, changed_section) {
+			console.log("panels.js class Panel update function called");
 			
+			let target = inbound_target ? inbound_target : document.getElementById(class_root._id);
+			let changed_section_tracker = changed_section;
+			
+			let html = `<div id=${this._id} class=module_box><div class=section_header><div id=${this.view_id} class="button blue">--</div><div class=section_title>${this.title}</div></div><div id=${this.paneldata_id} class=panel_data>`;
 			for (let [label, field] of Object.entries(p._panel_object._panel_display)) {
-				html += this.build_row(label, field);
+				
+				if (changed_section_tracker) {
+					var builder_value = changed_section_tracker.value;
+					
+					//stop doing this check if we triggered it. we're done.
+					if (`${class_root._id}-${label}` == changed_section.id) { changed_section_tracker = undefined };
+				}
+				
+				let new_html = this.build_row(label, field, builder_value);
+				
+				html += new_html
+					
 			};
 			
 			html += "</div></div>";

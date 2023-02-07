@@ -12,9 +12,37 @@ import * as druidity from "../modules/druidity.js";
 Gmodules["Druidity"] = new ManagedModule(druidity);
 
 
+//update the mod backend
+//then the ui
+function module_janitor(changed_field) {
+	let section = changed_field.substring(0, changed_field.indexOf("-"));
+	//we're only supporting a single panel for now
+	let this_module = Object.values(Gmodules)[0];
+	//this will need to be fixed to identify a module from many
+	
+	let mod_panels = this_module.mod_panels;
+	let display_panels = this_module.display_panels;
+	
+	//info only flows down
+	//no need to update earlier panels
+	let encountered_panel = false;
+	for (let prop in mod_panels) {
+		if (mod_panels[prop]._panel_name == section) { encountered_panel = true; }
+		if(encountered_panel) {
+			/*
+			prop is the module manager property name for both panel types
+			it might need to be var or const someday
+			console.log(prop);
+			*/
+			
+			let backend_object = (mod_panels[prop]._panel_object);
+			backend_object._update();
+			
+			let ui_object = display_panels[prop];
+			ui_object.update(false, document.getElementById(changed_field));
 
-function janitor(x) {
-	console.log(x);
+		};
+	}	
 }
 
 //public functions
@@ -31,7 +59,7 @@ export function from_bootstrapped_config(config){
 			let sb = ((v["event_listeners"])["select_boxes"]);
 			
 			for (let id in sb) {
-				document.getElementById(sb[id]).addEventListener("change", function(){janitor(sb[id])});
+				document.getElementById(sb[id]).addEventListener("change", function(){module_janitor(sb[id])});
 			}				
 		}
 		
