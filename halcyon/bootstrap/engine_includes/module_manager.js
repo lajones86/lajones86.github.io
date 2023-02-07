@@ -1,38 +1,43 @@
 "use strict";
-
 console.log(`Module awake: ${(new Error).fileName}`)
+import * as panels from "./panels.js";
+import {ManagedModule} from "./ManagedModule.js";
+var Gmodules = {};
 
-/* default module constructor
-requires a module_name and a friendly_name
-*/
-class ManagedModule {
-	constructor(raw_module) {
-		for (let panel in raw_module) {
-			//console.log(panel);
-			//let this_panel = new raw_module[panel]();
-			let this_panel = raw_module[panel];
-			//console.log(this_panel);
-			if (!this_panel["_panel_name"]) {
-				console.log(raw_module);console.log(panel);bad_message("module_manager.js failed to find panel_name in module. aborting module manager.");
-			}
-			if (!this_panel["_panel_name"]) { 
-				console.log(raw_module);console.log(panel);bad_message("module_manager.js encountered character '-' in _panel_name. aborting module manager.");
-			}
-		}
-		
-		this.module_data = raw_module;
-	};
-}
-export var managed_modules = [];
 
-// import and push modules here
+//add modules here
 
 //FANTASY DRUID KIT
 import * as druidity from "../modules/druidity.js";
-managed_modules.push(new ManagedModule(druidity));
+Gmodules["Druidity"] = new ManagedModule(druidity);
 
+
+
+function janitor(x) {
+	console.log(x);
+}
 
 //public functions
+//do not eat
+export function from_bootstrapped_config(config){
+	for (let [module_name, module_data] of Object.entries(Gmodules)) {
+		for (let mp of Object.entries(module_data.mod_panels)) {
+			let new_display_panel = panels.build_panel(mp);
+			module_data.display_panels[mp[0]] = new_display_panel;
+		}
+		
+		//console.log(module_data.display_panels);
+		for (let [k, v] of Object.entries(module_data.display_panels)) {
+			let sb = ((v["event_listeners"])["select_boxes"]);
+			
+			for (let id in sb) {
+				document.getElementById(sb[id]).addEventListener("change", function(){janitor(sb[id])});
+			}				
+		}
+		
+	}
+}
+
 export function bad_message(message_out) {
 	console.log(message_out);
 	alert(message_out);

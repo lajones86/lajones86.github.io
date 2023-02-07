@@ -2,11 +2,10 @@
 
 console.log(`Module awake: ${(new Error).fileName}`)
 
-const framework_baseline_properties = ["_panel_name", "_event_listeners"];
+import {bad_message} from "../engine_includes/module_manager.js";
 
-function generate_id(panel_name, field_name) {
-	return(`${panel_name}-${field_name}`);
-}
+const framework_var_properties = ["_panel_name", "_panel_object"];
+const panel_object_properties = ["_panel_display"];
 
 function make_title_from_varname(varname) {
 	if (varname.length == 2) { return(varname.toUpperCase()); }
@@ -14,22 +13,107 @@ function make_title_from_varname(varname) {
 }
 
 class Panel {
-	constructor(panel_data, target, is_update) {
-		//set class members
-		this._panel_name = panel_data._panel_name;
-		this._event_listeners = panel_data._event_listeners;
-		this.panel_data = panel_data;
-		this.panel_name = this._panel_name;
-		this.title = make_title_from_varname(this.panel_name);
-		this.id = generate_id(this.panel_name, this.panel_name);
-		this.action_id = generate_id(this.panel, "panelbutton");
-		this.view_id = generate_id(this.panel_name, "viewbutton");
-		this.panelwindow_id = generate_id(this.panel_name, "panelwindow");
-		this.paneldata_id = generate_id(this.panel_name, "paneldata");
-		this.select_boxes = [];
-		
-		//making the front end and back end play nice with this, i hope
+	constructor(p) {
 		var class_root = this;
+		
+		this._id = p._panel_name;
+		
+		this.title = make_title_from_varname(this._id);
+		this.view_id = `${this._id}-view`;
+		this.paneldata_id = `${this._id}-paneldata`;
+		this.event_listeners = {
+			select_boxes: [],
+		}
+		
+		this.track_field = function(f_id, f_type) {
+			if (f_type == "sb") { var tracker = this.event_listeners["select_boxes"] };
+			
+			if (!tracker.includes(f_id)) { tracker.push(f_id) };
+		};
+		
+		//build grid row based on data type
+		this.build_row = function(label, field) {
+			//console.log(label, field);
+			let ft = typeof(field);
+			let html = `<div>${make_title_from_varname(label)}</div>`;
+			
+			//number data
+			if (ft == "number") {
+				html += `<input type="text" id="${this._id}-${label}" value="${field}">`;
+			}
+			
+			//object data
+			else if (ft == "object") {
+				//arrays
+				if (Array.isArray(field)) {	
+					let sb_id = `${this._id}-${label}`
+					html += `<select id="${sb_id}">`;
+					for (let i in field) {
+						let option_title = (make_title_from_varname((field[i]).toString()));
+						html += `<option value="${field[i]}">${option_title}</options>`
+					}
+					html += "</select>";
+					this.track_field(sb_id, "sb");
+				}
+				//unknown
+				else { console.log(ft); }
+			}
+			
+			//unknown
+			else { console.log(ft); }
+			
+			return(html);
+		};
+		
+		/*
+		this.add_event_listeners = function() {
+			var update_target = document.getElementById(this._id);
+			for (let i in this.select_boxes) {
+				let the_box = this.select_boxes[i];
+				document.getElementById(the_box).addEventListener("change", function(){class_root.update(update_target)});
+			};
+		};
+		*/
+		
+		this.update = function(target) {
+			let html = `<div id=${this._id} class=module_box><div class=section_header><div id=${this.view_id} class="button blue">--</div><div class=section_title>${this.title}</div></div><div id=${this.paneldata_id} class=panel_data>`;
+			
+			for (let [label, field] of Object.entries(p._panel_object._panel_display)) {
+				html += this.build_row(label, field);
+			};
+			
+			html += "</div></div>";
+			if (target == document.body) { target.insertAdjacentHTML('beforeend', html) }
+			else { target.outerHTML = html };
+			//this.add_event_listeners();
+		};
+		
+		this.update(document.body);
+	}
+}
+
+
+export function build_panel(panel_to_build, target = document.body) {
+	console.log("panels.js received build_panel request");
+	return(new Panel(panel_to_build[1]));
+}
+
+
+		
+/*		
+		//set class members
+		this._panel_name = incoming_panel_data._panel_name;
+		this._panel_object = incoming_panel_data._panel_object;
+		
+		if (!is_update) {
+
+		}
+		
+		
+		this.id = generate_id(this._panel_name, this._panel_name);
+		this.view_id = generate_id(this._panel_name, "viewbutton");
+		this.panelwindow_id = generate_id(this._panel_name, "panelwindow");
+		this.paneldata_id = generate_id(this._panel_name, "paneldata");
 		
 		// minimize maximize button function
 		this.view_click = function() {
@@ -55,85 +139,107 @@ class Panel {
 				html_string += `<option value="${object_to_process[entry]}">${option_title}</options>`
 			}
 			html_string += "</select>";
-			//console.log(html_string);
 			return(html_string);
 		}
 		
-		
-		//initial body load
-		let html_string = `<div id=${this.id} class=module_box><div class=section_header><div id=${this.view_id} class="button blue">--</div><div class=section_title>${this.title}</div></div><div id=${this.panelwindow_id}><div id=${this.paneldata_id} class=panel_data>`;
-		for (let [key, value] of Object.entries(panel_data)) {
-			if (!framework_baseline_properties.includes(key)) {
-				let input_id = `${this.panel_name}-${key}`;
-											
-				let value_type = typeof(value)
+		if (!is_update) {
+			//initial body load
+			let html_string = `<div id=${this.id} class=module_box><div class=section_header><div id=${this.view_id} class="button blue">--</div><div class=section_title>${this.title}</div></div><div id=${this.panelwindow_id}><div id=${this.paneldata_id} class=panel_data>`;
+			for (let [key, value] of Object.entries(panel_data)) {
+				if (!framework_baseline_properties.includes(key)) {
+					let input_id = `${this._panel_name}-${key}`;
+					let value_type = typeof(value)
+					
+					if (value_type == "function") {
+						let function_name = value.name.toString();
+						value = panel_data[function_name](panel_data);
+						value_type = typeof(value)
+						if (value_type == "string" && value.length > 24) {value_type = "panel_quote"};
+					};
 				
-				if (value_type == "function") {
-					let function_name = value.name.toString();
-					value = panel_data[function_name](panel_data);
-					value_type = typeof(value)
-					if (value_type == "string" && value.length > 24) {value_type = "panel_quote"};
-				};
+					//add left side for 2-column entry
+					if (value_type != "panel_quote") {
+						let title = make_title_from_varname(key);
+						html_string += (`<div>${title}</div>`);
+					}
 				
-				//add left side for 2-column entry
-				if (value_type != "panel_quote") {
-					let title = make_title_from_varname(key);
-					html_string += (`<div>${title}</div>`);
-				}
-				
-				if (["number", "string"].includes(value_type)) {
-					html_string += `<input id="${input_id}" type="text" value=${value}>`;
-				}
+					if (["number", "string"].includes(value_type)) {
+						html_string += `<input id="${input_id}" type="text" value=${value}>`;
+					}
 
-				//add right side for 2-column entry
-				else if (value_type == "object") {
-					html_string += this.process_object(value, input_id);
-					panel_data[key] = value[0];
-					this.select_boxes.push(input_id);
-					//console.log(this.select_boxes);
-				}
+					//add right side for 2-column entry
+					else if (value_type == "object") {
+						html_string += this.process_object(value, input_id);
+						panel_data[key] = value[0];
+						this.select_boxes.push(input_id);
+					}
 				
-				else if (value_type == "panel_quote") {
-					//html_string += "<div>foo</div><div>bar</div>";
-					html_string += `<div class="grid_infopane">${value}</div>`;
-				}
+					else if (value_type == "panel_quote") {
+						html_string += `<div class="grid_infopane">${value}</div>`;
+					}
 				
-				//dunno what to do with this. here's what it is
-				else { html_string += `<span>${value_type}</span>`; }
+					//dunno what to do with this. here's what it is
+					else { html_string += `<span>${value_type}</span>`; }
+				}
+			}
+			
+			html_string += "</div>";
+
+			html_string += "</div></div>";
+		
+			if (!is_update) { target.insertAdjacentHTML('beforeend', html_string); }
+			else { target.outerHTML = html_string; }
+		
+			//get event listeners in
+			document.getElementById(this.view_id).addEventListener("click", this.view_click);
+			for (let sb in this.select_boxes) {
+				let the_box = this.select_boxes[sb]
+				document.getElementById(the_box).addEventListener("change", function(){global_janitor(the_box)});
 			}
 		}
-		html_string += "</div>";
-
-		html_string += "</div></div>";
 		
-		if (!is_update) { target.insertAdjacentHTML('beforeend', html_string); }
-		else { target.innerHTML = html_string; }
+		//constructor(incoming_panel_data, target, is_update)
+		this.update = function() {
+			target = (document.getElementById(class_root.id));
+			console.log(target);
+			let html_string = `<div id=${this.id} class=module_box><div class=section_header><div id=${this.view_id} class="button blue">--</div><div class=section_title>${this.title}</div></div><div id=${this.panelwindow_id}><div id=${this.paneldata_id} class=panel_data>`;
+			
+			console.log(html_string);
+			console.log(class_root._panel_object._panel_display);
+			
 		
-		//get event listeners in
-		document.getElementById(this.view_id).addEventListener("click", this.view_click);
-		for (let sb in this.select_boxes) {
-			let the_box = this.select_boxes[sb]
-			//console.log(the_box);
-			document.getElementById(the_box).addEventListener("change", function(){global_janitor(the_box)});
+			//get event listeners in
+			document.getElementById(this.view_id).addEventListener("click", this.view_click);
+			for (let sb in this.select_boxes) {
+				let the_box = this.select_boxes[sb]
+				document.getElementById(the_box).addEventListener("change", function(){global_janitor(the_box)});
+			}
+			console.log(html_string);
 		}
-		this.dom_object = function() {
-			return(document.getElementById(class_root.id));
-		}
+		
+		this.get_dom_object = function() { return(document.getElementById(class_root.id)) };
 	}
 }
+
 
 var global_collection = {};
 
 function global_janitor(changed_item) {
 	let panel_base = changed_item.substring(0, changed_item.indexOf("-"));
 	let starting_panel_object = Object.values(global_collection).filter(panel => panel._panel_name === panel_base)[0];
-	
-	build_panel(starting_panel_object.panel_data, starting_panel_object.dom_object(), true);
+	starting_panel_object.update();
+
+	let panel_rebuild = {
+		_panel_name: starting_panel_object._panel_name,
+		_panel_object: starting_panel_object._panel_object,
+	};
+	build_panel(panel_rebuild, starting_panel_object.get_dom_object(), true);
 }
 
 function build_panel(panel_data, target, is_update = false) {
 	var panel_out = new Panel(panel_data, target, is_update);
 	global_collection[panel_out._panel_name] = panel_out;
+	return(panel_out);
 }
 
 function build_module(module, target) {
@@ -141,11 +247,4 @@ function build_module(module, target) {
 		build_panel(panel_data, target);
 	}
 }
-
-export function build_modules(modules, target) {
-	console.log("panels.js received build_modules request");
-	for (let m = 0; m < modules.length; m++){
-		console.log(`attempting to build module ${m+1} of ${modules.length}`)
-		build_module(modules[m], target);
-	}
-}
+*/

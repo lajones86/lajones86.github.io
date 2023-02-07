@@ -2,22 +2,34 @@
 
 console.log(`Module awake: ${(new Error).fileName}`)
 
+
+//druidity panel
+class StatsPanel {
+	constructor(){
+		this._panel_display = stats_defaults;
+	}
+}
+var stats_defaults = {
+		level: 6,
+		casting_mod: 8,
+		casting_save: 15,
+}
+export var panel0 = {
+	_panel_name: "stats",
+	_panel_object: new StatsPanel(),
+};
+
+
+//summons panel
 class Summon {
 	constructor(s) {
-		this.summon_type = s.summon_type;
 		this.min_level = s.min_level;
 		this.subtypes = s.subtypes;
 	};
-	
-	update_subtypes() {
-		return(Object.keys(this.subtypes));
-	};
 }
-
-//models
-let summon_types = {
+//summon models
+const summon_models = {
 	beast: {
-		summon_type: "beast",
 		min_level: 2,
 		subtypes: {
 			"land": {
@@ -32,7 +44,6 @@ let summon_types = {
 		}
 	},
 	fey: {
-		summon_type: "fey",
 		min_level: 3,
 		subtypes: {
 		"fuming": {},
@@ -41,7 +52,6 @@ let summon_types = {
 		}
 	},
 	elemental: {
-		summon_type: "elemental",
 		min_level: 4,
 		subtypes: {
 			"air": {},
@@ -52,47 +62,60 @@ let summon_types = {
 	},
 };
 
-//druidity panel
-export var panel0 = {
-	_panel_name: "druidity",
-	level: 6,
-	casting_mod: 8,
-	casting_save: 15,
-};
+//summons panel
+class SummonsPanel {
+	constructor() {
+		
+		var class_root = this;
 
+		this.summons_objects = {};
+		for (let k of Object.keys(summon_models)){
+			this.summons_objects[k] = new Summon(summon_models[k]);
+		}
+		
+		
+		this.get_current_summon = function() {
+			let current_summon_field = document.getElementById("summons-summon_type");
+			if (!current_summon_field) { return(this.summons_objects[Object.keys(this.summons_objects)[0]]) }
+			else { return(this.summons_objects[current_summon_field.value]) };
+		};
+		
 
+		this._update = function() {
+			let panel_display = {};
+			//summon_type
+			panel_display["summon_type"] = Object.keys(summon_models);
+			
+			let current_summon = class_root.get_current_summon();
+			//console.log(current_summon);
+			
+			//subtype
+			panel_display["subtype"] = Object.keys(current_summon.subtypes);
+			
+			
+			//replace _panel_display object
+			
+			class_root._panel_display = panel_display;
+		};
+		
+		
 
-//summons panel helpers
-const summons = [
-	new Summon(summon_types["beast"]),
-	new Summon(summon_types["fey"]),
-	new Summon(summon_types["elemental"]),
-	]
-
-function get_summon() {
-	//var x = (x === undefined) ? your_default_value : x;
-	console.log("fetching summon object");
-	let summon_type = document.getElementById("summons-summon_type");
-	if (summon_type) { var summon_type_name = summon_type.value; }
-	else { var summon_type_name = Object.keys(summon_types)[0]; }
-	var summon = summons.filter(summon_instance => {
-		return summon_instance.summon_type === summon_type_name });
-	if (summon.length == 1) { summon = summon[0] };
-	return(summon);
+		//call the update function to build the _panel_display
+		this._update();
+	};
 }
 
-//summons panel
-export var panel20 = {
+export let panel20 = {
 	_panel_name: "summons",
-	summon_type: Object.keys(summon_types),
-	subtype: get_summon().update_subtypes(),
+	_panel_object: new SummonsPanel(),
 };
 
 
 
-
+/*
 //totems panel
 export var panel40 = {
 	_panel_name: "totems",
 	totem_type: [1, 2, 3],
 };
+*/
